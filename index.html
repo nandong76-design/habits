@@ -32,12 +32,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
 
 /* ── LAYOUT ── */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .4rem;padding-top:calc(env(safe-area-inset-top) + 1rem);max-width:480px;margin:0 auto;width:100%}
-.tb-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.tb-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
 .tb-right{display:flex;gap:6px}
 .icon-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--t2);font-size:17px;border-radius:50%}
 .icon-btn:active{background:var(--acc-bg)}
 .tabs{display:flex;border-bottom:1px solid var(--bd);max-width:480px;margin:0 auto;width:100%}
-.tab{flex:1;padding:9px 0;font-size:13px;font-weight:500;color:var(--t3);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;margin-bottom:-1px;transition:all .15s}
+.tab{flex:1;padding:9px 0;font-size:16px;font-weight:500;color:var(--t3);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;margin-bottom:-1px;transition:all .15s}
 .tab.active{color:var(--t1);border-bottom-color:var(--t1)}
 .tab-content{display:none;flex:1;padding:1rem 1.1rem;overflow-y:auto;max-width:480px;margin:0 auto;width:100%}
 .tab-content.active{display:block}
@@ -57,9 +57,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
 .edit-toggle.on{color:var(--t1);font-weight:700}
 
 /* ── GOAL CARD ── */
-.gc{background:var(--card);border:0.5px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;cursor:grab}
-.gc.dragging{opacity:.4}
-.gc.drag-over{border-color:var(--t1)}
+.gc{background:var(--card);border:0.5px solid var(--bd);border-radius:var(--r);padding:9px 12px;margin-bottom:6px;cursor:grab;transition:box-shadow .2s,opacity .2s}
+.gc.dragging{opacity:.35;box-shadow:none}
+.gc.drag-over{border-color:var(--t1);box-shadow:0 0 0 2px var(--t1)}
+.gc.sort-mode{cursor:grab;border-color:var(--g)}
 .gc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}
 .gc-name{font-size:15px;font-weight:700;color:var(--t1);line-height:1.35;flex:1}
 .gc-pct{font-size:13px;font-weight:700;color:var(--g);white-space:nowrap}
@@ -635,15 +636,15 @@ function renderHabits(){
   }else{
     list.innerHTML=db.habits.map(h=>{
       const active=h.days[dow];
-      return `<div class="hi${!active?' inactive':''}" draggable="${active}" data-id="${h.id}" data-type="habit"
-        ${active?`ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)"
-        ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)"`:''}> 
+      return `<div class="hi${!active?' inactive':''}" data-id="${h.id}" data-type="habit"
+        ${active?`draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)"`:''}> 
         <div class="hc${h.doneToday&&active?' done':''}" ${active?`onclick="toggleHabit('${h.id}')"`:''}>${h.doneToday&&active?'✓':''}</div>
         <div class="hi-info">
           <div class="hn${h.doneToday&&active?' done':''}">${h.name}</div>
           <div class="hm">${active?habitMetaLabel(h):h.days.filter(Boolean).map((_,i)=>h.days[i]?DAYS[i]:null).filter(Boolean).join('·')+' — 오늘 해당 없음'}</div>
         </div>
-        ${active?`<div class="drag-h">⋮⋮</div>`:''}
+        ${active?`<button class="cb" onclick="moveItem('habit','${h.id}',-1)" style="font-size:12px;flex-shrink:0">▲</button>
+        <button class="cb" onclick="moveItem('habit','${h.id}',+1)" style="font-size:12px;flex-shrink:0">▼</button>`:''}
       </div>`;
     }).join('');
   }
