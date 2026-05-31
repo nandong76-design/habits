@@ -637,14 +637,13 @@ function renderHabits(){
     list.innerHTML=db.habits.map(h=>{
       const active=h.days[dow];
       return `<div class="hi${!active?' inactive':''}" data-id="${h.id}" data-type="habit"
-        ${active?`draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)"`:''}> 
+        ${active?`draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)"`:''}> 
         <div class="hc${h.doneToday&&active?' done':''}" ${active?`onclick="toggleHabit('${h.id}')"`:''}>${h.doneToday&&active?'✓':''}</div>
         <div class="hi-info">
           <div class="hn${h.doneToday&&active?' done':''}">${h.name}</div>
           <div class="hm">${active?habitMetaLabel(h):h.days.filter(Boolean).map((_,i)=>h.days[i]?DAYS[i]:null).filter(Boolean).join('·')+' — 오늘 해당 없음'}</div>
         </div>
-        ${active?`<button class="cb" onclick="moveItem('habit','${h.id}',-1)" style="font-size:12px;flex-shrink:0">▲</button>
-        <button class="cb" onclick="moveItem('habit','${h.id}',+1)" style="font-size:12px;flex-shrink:0">▼</button>`:''}
+        ${active?`<div class="drag-h" style="cursor: grab; font-size: 14px; padding: 2px 4px; color: var(--t3);">≡</div>`:''}
       </div>`;
     }).join('');
   }
@@ -815,12 +814,15 @@ function touchEnd(e){
   }
   touchDragEl=null;
 }
-function reorder(type,fId,tId){
-  const arr=type==='goal'?db.goals.filter(g=>!g.archived):db.habits;
-  const fi=arr.findIndex(x=>x.id===fId),ti=arr.findIndex(x=>x.id===tId);
-  if(fi<0||ti<0)return;
-  const [item]=arr.splice(fi,1);arr.splice(ti,0,item);
-  saveDb();type==='goal'?renderGoals():renderHabits();
+function reorder(type, fId, tId) {
+  const arr = type === 'goal' ? db.goals : db.habits;
+  const fi = arr.findIndex(x => x.id === fId);
+  const ti = arr.findIndex(x => x.id === tId);
+  if (fi < 0 || ti < 0) return;
+  const [item] = arr.splice(fi, 1);
+  arr.splice(ti, 0, item);
+  saveDb();
+  type === 'goal' ? renderGoals() : renderHabits();
 }
 
 /* ══ SHEETS SYNC ══ */
